@@ -1,0 +1,3 @@
+package com.retina.ai;
+import com.retina.ai.config.OpenAiConfig; import com.retina.ai.controller.ApiRouter; import com.retina.ai.repository.Repositories; import com.retina.ai.service.*;
+public class RetinaAiApplication { public static void main(String[] args) throws Exception {Repositories repo=new Repositories(); PlatformService service=new PlatformService(repo,new OpenAiVisionService(OpenAiConfig.fromEnv())); int port=Integer.parseInt(System.getenv().getOrDefault("PORT","8080")); new ApiRouter(service).start(port); System.out.println("Retina AI Platform running on http://localhost:"+port+"/api/health");} }

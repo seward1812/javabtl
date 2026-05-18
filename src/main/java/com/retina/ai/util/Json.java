@@ -1,0 +1,8 @@
+package com.retina.ai.util;
+import java.lang.reflect.*; import java.time.temporal.TemporalAccessor; import java.util.*;
+public final class Json { private Json(){}
+ public static String write(Object o){StringBuilder b=new StringBuilder();val(b,o);return b.toString();}
+ private static void val(StringBuilder b,Object o){ if(o==null)b.append("null"); else if(o instanceof String s)b.append('"').append(esc(s)).append('"'); else if(o instanceof Number||o instanceof Boolean)b.append(o); else if(o instanceof Enum<?> e)b.append('"').append(e.name()).append('"'); else if(o instanceof TemporalAccessor)b.append('"').append(o).append('"'); else if(o instanceof Collection<?> c){b.append('['); boolean first=true; for(Object x:c){if(!first)b.append(','); val(b,x); first=false;} b.append(']');} else if(o instanceof Map<?,?> m){b.append('{'); boolean first=true; for(var e:m.entrySet()){if(!first)b.append(','); val(b,String.valueOf(e.getKey())); b.append(':'); val(b,e.getValue()); first=false;} b.append('}');} else obj(b,o); }
+ private static void obj(StringBuilder b,Object o){b.append('{'); boolean first=true; if(o.getClass().isRecord()){for(RecordComponent c:o.getClass().getRecordComponents()) try{ if(!first)b.append(','); val(b,c.getName()); b.append(':'); val(b,c.getAccessor().invoke(o)); first=false;}catch(Exception ignored){}} else {for(Field f:o.getClass().getFields()) try{ if(!first)b.append(','); val(b,f.getName()); b.append(':'); val(b,f.get(o)); first=false;}catch(Exception ignored){}} b.append('}');}
+ private static String esc(String s){return s.replace("\\","\\\\").replace("\"","\\\"").replace("\n","\\n");}
+}
